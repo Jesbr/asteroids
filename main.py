@@ -9,12 +9,13 @@ from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
+from words import ScoreText
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-    
+
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
@@ -29,9 +30,13 @@ def main():
     
     player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
 
+    score_text = ScoreText(position=(SCREEN_WIDTH // 2, 30))  # Center top
+    PLAYER_SCORE = 0
+
     dt = 0
 
     while True: # This will make the window's close button work:
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 
@@ -41,16 +46,20 @@ def main():
         for asteroid in asteroids:
             if asteroid.collides_with(player):
                 print("Game over!")
+                print(f"Your score was: {PLAYER_SCORE}!")
                 sys.exit()
             
             for shot in shots:
                 if asteroid.collides_with(shot):
+                    PLAYER_SCORE += 1
+                    score_text.set_score(PLAYER_SCORE)
                     shot.kill()
                     asteroid.split()
 
-        screen.fill("black")    # Clear screen with black    
+        screen.fill("black")    # Clear screen with black   
         for obj in drawable:
-            obj.draw(screen)  
+            obj.draw(screen) 
+        score_text.draw(screen) 
         pygame.display.flip()   # Update the display
 
         dt = clock.tick(60)/1000    # limit the framerate to 60 FPS
